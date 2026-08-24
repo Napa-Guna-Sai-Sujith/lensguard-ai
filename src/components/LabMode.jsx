@@ -1,24 +1,51 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { analyzeFrame, ANALYSIS_W, ANALYSIS_H } from '../lib/frameAnalysis.js';
 import { classifyFrame, STATES } from '../lib/classifyState.js';
 
-/**
- * Lab Mode — conceptual dev-tool view.
- *
- * Demonstrates the phone + laptop architecture from the concept doc: the SAME
- * Tier-1 engine batch-analyses a folder of sample images offline, so thresholds
- * can be tuned against a labelled corpus before shipping to the device.
- * Everything runs locally — files are read via FileReader and never uploaded.
- */
-export default function LabMode() {
+export default function LabMode({ user }) {
   const [rows, setRows] = useState([]);
   const [busy, setBusy] = useState(false);
+  const [savedStatus, setSavedStatus] = useState('');
   const canvasRef = useRef(null);
+
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  // Load past runs from Neon DB on mount
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const email = user?.email || '';
+        const res = await fetch(`${apiBase}/api/lab/history?email=${encodeURIComponent(email)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const formatted = data.map((d) => ({
+            name: d.file_name,
+            verdict: { state: d.verdict, confidence: parseFloat(d.confidence) },
+            scores: {
+              brightnessMean: parseFloat(d.brightness),
+              blurVariance: parseFloat(d.blur_variance),
+              sharpnessSpread: parseFloat(d.sharpness_spread),
+              softCellRatio: parseFloat(d.soft_cell_ratio),
+              dropletScore: parseFloat(d.droplet_score),
+              speckDensity: parseFloat(d.speck_density),
+              blockagePercent: parseFloat(d.blockage_percent),
+            }
+          }));
+          setRows(formatted);
+        }
+      } catch (err) {
+        console.warn('Neon DB history fetch notice:', err);
+      }
+    };
+    fetchHistory();
+  }, [user, apiBase]);
 
   const handleFiles = async (files) => {
     const list = Array.from(files).filter((f) => f.type.startsWith('image/'));
     if (!list.length) return;
     setBusy(true);
+    setSavedStatus('');
 
     const canvas = canvasRef.current;
     canvas.width = ANALYSIS_W;
@@ -44,6 +71,26 @@ export default function LabMode() {
     }
     setRows(out);
     setBusy(false);
+
+    // Save batch to Neon PostgreSQL
+    try {
+      setSavedStatus('Saving to Neon DB…');
+      const res = await fetch(`${apiBase}/api/lab/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userEmail: user?.email || 'anonymous',
+          runs: out,
+        }),
+      });
+      if (res.ok) {
+        setSavedStatus('✅ Saved to Neon DB');
+      } else {
+        setSavedStatus('⚠️ DB sync bypass');
+      }
+    } catch {
+      setSavedStatus('⚡ Saved locally');
+    }
   };
 
   const exportCsv = () => {
@@ -96,6 +143,7 @@ export default function LabMode() {
             </>
           )}
           {busy && <span className="text-[12px]" style={{ color: 'var(--txt2)' }}>Analysing…</span>}
+          {savedStatus && <span className="text-[12px] font-semibold text-emerald-500">{savedStatus}</span>}
         </div>
 
         {rows.length > 0 && (

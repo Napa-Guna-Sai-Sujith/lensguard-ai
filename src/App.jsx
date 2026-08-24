@@ -183,7 +183,7 @@ export default function App() {
       {/* ---------------------------------------------------------------- */}
       <main className="mx-auto max-w-[1400px] px-3 py-3 sm:px-4 sm:py-4 pb-10">
         {tab === 'lab' ? (
-          <LabMode />
+          <LabMode user={user} />
         ) : (
           <div className="space-y-4">
             <div className="grid items-start gap-4 md:grid-cols-2 lg:grid-cols-5">

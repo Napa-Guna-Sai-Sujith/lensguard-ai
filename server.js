@@ -35,7 +35,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date() });
 });
 
-// Initialize Table
+// Initialize Tables
 pool.query(`
   CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -46,7 +46,23 @@ pool.query(`
     avatar_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
   );
-`).then(() => console.log('✅ Users table ready in Neon PostgreSQL')).catch(console.error);
+
+  CREATE TABLE IF NOT EXISTS lab_runs (
+    id SERIAL PRIMARY KEY,
+    user_email VARCHAR(255),
+    file_name VARCHAR(255),
+    verdict VARCHAR(50),
+    confidence NUMERIC,
+    brightness NUMERIC,
+    blur_variance NUMERIC,
+    sharpness_spread NUMERIC,
+    soft_cell_ratio NUMERIC,
+    droplet_score NUMERIC,
+    speck_density NUMERIC,
+    blockage_percent NUMERIC,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  );
+`).then(() => console.log('✅ PostgreSQL tables (users, lab_runs) ready')).catch(console.error);
 
 // 1. Email/Password Registration
 app.post('/api/auth/register', async (req, res) => {
@@ -146,6 +162,57 @@ app.post('/api/auth/google', async (req, res) => {
   } catch (err) {
     console.error('Google auth error:', err);
     res.status(500).json({ error: 'Server error during Google authentication' });
+  }
+});
+
+// 4. Save Lab Mode analysis batch to Neon PostgreSQL
+app.post('/api/lab/save', async (req, res) => {
+  const { userEmail, runs } = req.body;
+  if (!Array.isArray(runs) || runs.length === 0) {
+    return res.status(400).json({ error: 'No lab runs provided' });
+  }
+
+  try {
+    for (const r of runs) {
+      if (r.error) continue;
+      await pool.query(
+        `INSERT INTO lab_runs 
+         (user_email, file_name, verdict, confidence, brightness, blur_variance, sharpness_spread, soft_cell_ratio, droplet_score, speck_density, blockage_percent)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+        [
+          userEmail || 'anonymous',
+          r.name,
+          r.verdict.state,
+          r.verdict.confidence,
+          r.scores.brightnessMean,
+          r.scores.blurVariance,
+          r.scores.sharpnessSpread,
+          r.scores.softCellRatio,
+          r.scores.dropletScore,
+          r.scores.speckDensity,
+          r.scores.blockagePercent
+        ]
+      );
+    }
+    res.json({ message: 'Lab analysis results saved to Neon DB' });
+  } catch (err) {
+    console.error('Lab save error:', err);
+    res.status(500).json({ error: 'Failed to persist lab runs' });
+  }
+});
+
+// 5. Fetch Lab Mode analysis history from Neon PostgreSQL
+app.get('/api/lab/history', async (req, res) => {
+  const userEmail = req.query.email;
+  try {
+    const query = userEmail
+      ? 'SELECT * FROM lab_runs WHERE user_email = $1 ORDER BY created_at DESC LIMIT 50'
+      : 'SELECT * FROM lab_runs ORDER BY created_at DESC LIMIT 50';
+    const result = await pool.query(query, userEmail ? [userEmail] : []);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Lab fetch error:', err);
+    res.status(500).json({ error: 'Failed to fetch lab history' });
   }
 });
 
