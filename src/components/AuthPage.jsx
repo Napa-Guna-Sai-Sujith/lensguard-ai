@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import { useTheme } from '../lib/useTheme.js';
+import ThemeToggle from './ThemeToggle.jsx';
 
 export default function AuthPage({ onAuthSuccess }) {
+  const { theme, toggle } = useTheme();
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -71,9 +74,13 @@ export default function AuthPage({ onAuthSuccess }) {
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md rounded-2xl border p-6 sm:p-8 shadow-xl themed"
+        className="relative w-full max-w-md rounded-2xl border p-6 sm:p-8 shadow-xl themed"
         style={{ backgroundColor: 'var(--bg)', borderColor: 'var(--line)' }}
       >
+        <div className="absolute right-4 top-4 z-10">
+          <ThemeToggle theme={theme} onToggle={toggle} />
+        </div>
+
         <div className="text-center mb-6">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl text-2xl shadow-md"
                style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}>
