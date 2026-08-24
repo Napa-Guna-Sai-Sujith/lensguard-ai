@@ -14,6 +14,7 @@ import ReportModal from './components/ReportModal.jsx';
 import LabMode from './components/LabMode.jsx';
 import AuthModal from './components/AuthModal.jsx';
 import AuthPage from './components/AuthPage.jsx';
+import UserMenu from './components/UserMenu.jsx';
 
 const MAX_EVENTS = 10;
 
@@ -157,30 +158,16 @@ export default function App() {
 
           <ThemeToggle theme={theme} onToggle={toggle} />
 
-          {/* User Auth Profile / Login Button */}
+          {/* User Auth Profile Dropdown */}
           {user ? (
-            <div className="flex items-center gap-2 border-l pl-3" style={{ borderColor: 'var(--line)' }}>
-              {user.avatar_url ? (
-                <img src={user.avatar_url} alt={user.name} className="h-7 w-7 rounded-full object-cover ring-1 ring-white/20" />
-              ) : (
-                <div className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-                     style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}>
-                  {user.name?.[0]?.toUpperCase() || 'U'}
-                </div>
-              )}
-              <span className="hidden text-xs font-semibold sm:inline">{user.name}</span>
-              <button
-                onClick={() => {
-                  localStorage.removeItem('lensguard_token');
-                  localStorage.removeItem('lensguard_user');
-                  setUser(null);
-                }}
-                title="Sign Out"
-                className="text-[11px] font-medium opacity-70 hover:opacity-100 underline"
-              >
-                Exit
-              </button>
-            </div>
+            <UserMenu
+              user={user}
+              onSignOut={() => {
+                localStorage.removeItem('lensguard_token');
+                localStorage.removeItem('lensguard_user');
+                setUser(null);
+              }}
+            />
           ) : (
             <button
               onClick={() => setAuthOpen(true)}
