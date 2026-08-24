@@ -18,11 +18,12 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
     setError('');
     setLoading(true);
 
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
     const payload = isLogin ? { email, password } : { name, email, password };
 
     try {
-      const res = await fetch(`http://localhost:5000${endpoint}`, {
+      const res = await fetch(`${apiBase}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -46,8 +47,9 @@ export default function AuthModal({ open, onClose, onAuthSuccess }) {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
+      const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const decoded = jwtDecode(credentialResponse.credential);
-      const res = await fetch('http://localhost:5000/api/auth/google', {
+      const res = await fetch(`${apiBase}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

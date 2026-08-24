@@ -8,7 +8,14 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// Allow requests from localhost and Vercel frontend deployments
+app.use(cors({
+  origin: '*', // Allows all origins or replace with your Vercel URL, e.g., 'https://lensguard-ai.vercel.app'
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 const pool = new pg.Pool({
@@ -17,6 +24,11 @@ const pool = new pg.Pool({
 });
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
+
+// Health Check Endpoint for Render & Monitoring
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date() });
+});
 
 // Initialize Table
 pool.query(`
@@ -100,7 +112,6 @@ app.post('/api/auth/login', async (req, res) => {
 // 3. Google OAuth Token Verification & User Sync
 app.post('/api/auth/google', async (req, res) => {
   const { googleToken, payload } = req.body;
-  // Note: payload can contain decoded JWT from @react-oauth/google (credential)
   if (!payload || !payload.email) {
     return res.status(400).json({ error: 'Invalid Google auth payload' });
   }
@@ -112,7 +123,6 @@ app.post('/api/auth/google', async (req, res) => {
     let user;
 
     if (result.rows.length === 0) {
-      // Create user
       const inserted = await pool.query(
         'INSERT INTO users (name, email, google_id, avatar_url) VALUES ($1, $2, $3, $4) RETURNING id, name, email, avatar_url',
         [name, email, googleId, avatar_url]
@@ -120,7 +130,6 @@ app.post('/api/auth/google', async (req, res) => {
       user = inserted.rows[0];
     } else {
       user = result.rows[0];
-      // Link google_id if missing
       if (!user.google_id) {
         await pool.query('UPDATE users SET google_id = $1, avatar_url = $2 WHERE id = $3', [googleId, avatar_url, user.id]);
       }
@@ -136,4 +145,4 @@ app.post('/api/auth/google', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Auth server running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Auth server running on port ${PORT}`));
