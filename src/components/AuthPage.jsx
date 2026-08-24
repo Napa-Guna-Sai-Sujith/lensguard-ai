@@ -11,14 +11,6 @@ export default function AuthPage({ onAuthSuccess }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const fillDemoCredentials = () => {
-    setIsLogin(true);
-    setName('Demo User');
-    setEmail('demo@lensguard.ai');
-    setPassword('demo1234');
-    setError('');
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -91,23 +83,6 @@ export default function AuthPage({ onAuthSuccess }) {
           <p className="text-xs mt-1" style={{ color: 'var(--txt2)' }}>
             On-device real-time camera health monitor
           </p>
-        </div>
-
-        {/* Demo Quick Fill Banner */}
-        <div className="mb-5 rounded-xl border p-3 flex items-center justify-between"
-             style={{ backgroundColor: 'var(--card-2)', borderColor: 'var(--line)' }}>
-          <div className="text-xs">
-            <span className="font-semibold block">⚡ Quick Demo Login</span>
-            <span style={{ color: 'var(--txt2)' }}>Click to fill test credentials</span>
-          </div>
-          <button
-            type="button"
-            onClick={fillDemoCredentials}
-            className="rounded-lg px-3 py-1.5 text-xs font-bold transition-all hover:scale-105 active:scale-95"
-            style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
-          >
-            Auto Fill
-          </button>
         </div>
 
         <div className="flex rounded-xl border p-0.5 mb-5 themed" style={{ borderColor: 'var(--line)' }}>
