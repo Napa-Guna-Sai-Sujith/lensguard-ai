@@ -1,0 +1,56 @@
+/* Self-hosted fonts — bundled, so no network fetch and no FOUT offline. */
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/600.css';
+@import './styles/theme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .lg-card {
+    @apply rounded-2xl border themed;
+    background-color: var(--card);
+    border-color: var(--line);
+    box-shadow: var(--shadow-card);
+  }
+  .lg-btn {
+    @apply rounded-xl px-3 py-2 text-sm font-medium border themed transition-colors;
+    border-color: var(--line);
+    background-color: var(--card);
+    color: var(--txt);
+    min-height: 40px;
+  }
+  .lg-btn:hover { background-color: var(--card-2); }
+
+  /* Brand CTA — solid yellow with ink text, as in the reference. */
+  .lg-btn-brand {
+    @apply rounded-xl px-4 py-2 text-sm font-semibold border-0 transition-transform;
+    background-color: var(--accent);
+    color: var(--accent-contrast);
+    min-height: 40px;
+  }
+  .lg-btn-brand:hover { filter: brightness(1.04); }
+  .lg-btn-brand:active { transform: translateY(1px); }
+
+  /* Dark pill (light mode) / yellow pill (dark mode) — the nav CTA. */
+  .lg-pill {
+    @apply rounded-full px-3.5 py-2 text-[12px] font-semibold transition-colors;
+    background-color: var(--pill);
+    color: var(--pill-txt);
+  }
+
+  .lg-chip {
+    @apply rounded-lg px-2 py-1 text-[11px] font-medium mono;
+    background-color: var(--card-2);
+    color: var(--txt2);
+  }
+  .lg-track {
+    background-color: var(--track);
+    @apply rounded-full overflow-hidden;
+  }
+}

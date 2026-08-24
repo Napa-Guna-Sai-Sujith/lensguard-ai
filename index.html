@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#0E1116" />
+    <meta name="description" content="LensGuard AI — real-time, on-device camera lens health monitor. Detects smudges, dust, moisture, blockage, low light and blur entirely in the browser." />
+    <title>LensGuard AI — On-device camera health monitor</title>
+    <script>
+      // Resolve the theme BEFORE first paint so there is never a flash of the
+      // wrong theme. Mirrors the logic in src/lib/useTheme.js.
+      (function () {
+        try {
+          var saved = localStorage.getItem('lensguard.theme');
+          var t = (saved === 'light' || saved === 'dark')
+            ? saved
+            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', t);
+          document.documentElement.style.colorScheme = t;
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

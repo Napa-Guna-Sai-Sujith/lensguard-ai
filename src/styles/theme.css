@@ -1,0 +1,134 @@
+/* ============================================================
+   LensGuard AI — theme tokens (Botanix-inspired yellow brand)
+   Palette sampled from the reference design:
+     brand yellow #FCCD03 · ink #0A0A0A · dark pill #2A2A2A
+   Every surface reads from these variables so light/dark stay
+   perfectly in sync. Theme is applied via data-theme on <html>.
+   ============================================================ */
+
+:root,
+[data-theme='light'] {
+  /* The signature look: a saturated yellow field with a white
+     content shell floating on top of it. */
+  --field: #fccd03;
+  --bg: #ffffff;
+  --bg-grad: none;
+  --card: #ffffff;
+  --card-2: #f7f6f2;
+  --line: #ebe9e2;
+  --txt: #0a0a0a;
+  --txt2: #6f6d66;
+
+  /* Brand yellow is the accent, but it fails contrast as text on white.
+     --accent      → fills/borders (paired with ink text)
+     --accent-ink  → text/links/focus rings that must stay legible */
+  --accent: #fccd03;
+  --accent-ink: #8a6a00;
+  --accent-contrast: #0a0a0a; /* text placed ON accent fills */
+  --accent-soft: rgba(252, 205, 3, 0.16);
+
+  --pill: #2a2a2a;
+  --pill-txt: #ffffff;
+
+  --shadow-card: 0 1px 2px rgba(16, 14, 4, 0.05), 0 10px 30px rgba(16, 14, 4, 0.07);
+  --shadow-pop: 0 24px 70px rgba(16, 14, 4, 0.24);
+  --shadow-shell: 0 30px 80px rgba(80, 62, 0, 0.22);
+
+  /* Status hues — light mode.
+     Smudge is pushed toward a deeper amber so it stays distinguishable
+     from the brand yellow it now sits beside. */
+  --c-good: #1a9d52;         --t-good: #e7f8ee;
+  --c-smudge: #e07c1f;       --t-smudge: #fdf0e0;
+  --c-dust: #8b5e34;         --t-dust: #f3e9de;
+  --c-water: #2f80ed;        --t-water: #e8f1fe;
+  --c-blocked: #e03d3d;      --t-blocked: #fdeaea;
+  --c-lowlight: #4b5563;     --t-lowlight: #eef0f2;
+  --c-blur: #6b7280;         --t-blur: #f1f2f4;
+
+  --track: #eceae3;
+  --scrim: rgba(20, 16, 2, 0.44);
+}
+
+[data-theme='dark'] {
+  --field: #0a0a0a;
+  --bg: #101010;
+  --bg-grad: radial-gradient(1100px 560px at 12% -14%, #1c1a12 0%, #101010 60%);
+  --card: #191919;
+  --card-2: #212121;
+  --line: #2c2c2c;
+  --txt: #f7f6f3;
+  --txt2: #9d9a92;
+
+  --accent: #fccd03;
+  --accent-ink: #fcd535; /* bright enough for AA text on dark surfaces */
+  --accent-contrast: #0a0a0a;
+  --accent-soft: rgba(252, 205, 3, 0.16);
+
+  --pill: #fccd03;
+  --pill-txt: #0a0a0a;
+
+  --shadow-card: 0 0 0 1px var(--line);
+  --shadow-pop: 0 22px 60px rgba(0, 0, 0, 0.66);
+  --shadow-shell: 0 0 0 1px #232323;
+
+  /* Same hues, lightness boosted ~10-15%; tints become low-opacity washes. */
+  --c-good: #35d07f;         --t-good: rgba(53, 208, 127, 0.15);
+  --c-smudge: #ffa94d;       --t-smudge: rgba(255, 169, 77, 0.15);
+  --c-dust: #c58a55;         --t-dust: rgba(197, 138, 85, 0.16);
+  --c-water: #56a0ff;        --t-water: rgba(86, 160, 255, 0.15);
+  --c-blocked: #ff7a7a;      --t-blocked: rgba(255, 122, 122, 0.15);
+  --c-lowlight: #8c95a5;     --t-lowlight: rgba(140, 149, 165, 0.16);
+  --c-blur: #9aa3b2;         --t-blur: rgba(154, 163, 178, 0.14);
+
+  --track: #292929;
+  --scrim: rgba(0, 0, 0, 0.68);
+}
+
+* { -webkit-tap-highlight-color: transparent; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--field);
+  color: var(--txt);
+  font-family: Inter, Manrope, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 260ms ease, color 260ms ease;
+}
+
+/* The floating white content shell that sits on the yellow field. */
+.app-shell {
+  background: var(--bg);
+  background-image: var(--bg-grad);
+  box-shadow: var(--shadow-shell);
+  transition: background-color 260ms ease, box-shadow 260ms ease;
+}
+
+.themed { transition: background-color 240ms ease, border-color 240ms ease, color 240ms ease; }
+
+/* Status color morph — 400ms so state changes feel like a morph, not a cut */
+.status-morph {
+  transition: color 400ms ease, background-color 400ms ease, border-color 400ms ease,
+    box-shadow 400ms ease;
+}
+
+.mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; font-feature-settings: 'tnum' 1; }
+
+:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
