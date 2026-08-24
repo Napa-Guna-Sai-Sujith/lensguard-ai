@@ -216,7 +216,7 @@ export default function App() {
               </div>
 
               <div className="order-2 space-y-4 md:order-2 md:col-span-1 lg:order-none lg:col-span-2 lg:col-start-1 lg:row-span-2 lg:row-start-1">
-                <StatusCard verdict={verdict} mlStatus={mlStatus} analysisMs={analysisMs} />
+                <StatusCard verdict={verdict} mlStatus={mlStatus} analysisMs={analysisMs} cameraOn={cameraOn} camState={camState} />
                 <DetectionPanel scores={scores} spark={spark} showGrid={showGrid}
                                 onToggleGrid={() => setShowGrid((g) => !g)} />
                 <DemoControls active={demoMode} onSelect={setDemoMode}

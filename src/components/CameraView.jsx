@@ -153,17 +153,23 @@ export default function CameraView({
         </div>
 
         {/* Permission / error / camera off states */}
-        {!live && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center"
+        {(!live || !cameraOn || camState === 'off') && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center z-20"
                style={{ backgroundColor: 'var(--card)' }}>
-            {camState === 'off' || !cameraOn ? (
+            {!cameraOn || camState === 'off' ? (
               <>
-                <div className="text-3xl text-rose-400">📷</div>
-                <h3 className="text-base font-semibold">Camera is Turned Off</h3>
-                <p className="max-w-sm text-sm" style={{ color: 'var(--txt2)' }}>
-                  Click the camera icon in the top right to turn the live video feed back on.
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/10 text-3xl text-rose-500 shadow-inner">
+                  🚫
+                </div>
+                <h3 className="text-base font-bold text-rose-500">Camera Disconnected / Turned Off</h3>
+                <p className="max-w-sm text-xs leading-relaxed" style={{ color: 'var(--txt2)' }}>
+                  The camera video feed has been turned off. LensGuard AI is paused until the camera feed is re-enabled.
                 </p>
-                <button onClick={onToggleCamera} className="lg-btn-brand mt-1">
+                <button
+                  onClick={onToggleCamera}
+                  className="rounded-xl px-4 py-2 text-xs font-bold transition-all hover:scale-105 active:scale-95 shadow-md mt-1"
+                  style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-contrast)' }}
+                >
                   Turn Camera On
                 </button>
               </>

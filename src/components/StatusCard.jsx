@@ -3,8 +3,18 @@ import { STATES } from '../lib/classifyState.js';
 import ConfidenceMeter from './ConfidenceMeter.jsx';
 
 /** The verdict hero: big icon, headline, action message, confidence, evidence. */
-export default function StatusCard({ verdict, mlStatus, analysisMs }) {
-  const st = STATES[verdict.state] || STATES.good;
+export default function StatusCard({ verdict, mlStatus, analysisMs, cameraOn = true, camState }) {
+  const isOff = !cameraOn || camState === 'off';
+  const st = isOff ? {
+    id: 'off',
+    label: 'Camera Paused',
+    icon: '🚫',
+    colorVar: '--c-blocked',
+    tintVar: '--tint-blocked',
+    message: 'Camera stream turned off. Turn the camera back on to resume real-time lens health diagnostics.',
+    reason: 'Video feed suspended by user toggle'
+  } : (STATES[verdict.state] || STATES.good);
+
   const color = `var(${st.colorVar})`;
   const tint = `var(${st.tintVar})`;
   const settling = verdict.pending && verdict.pending !== verdict.state;
