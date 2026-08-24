@@ -144,17 +144,17 @@ export default function App() {
       </header>
 
       {/* ---------------------------------------------------------------- */}
-      <main className="mx-auto max-w-[1400px] px-4 py-4 pb-10">
+      <main className="mx-auto max-w-[1400px] px-3 py-3 sm:px-4 sm:py-4 pb-10">
         {tab === 'lab' ? (
           <LabMode />
         ) : (
           <div className="space-y-4">
-            <div className="grid items-start gap-4 lg:grid-cols-5">
-              {/* Explicit placement so both breakpoints read correctly:
-                    mobile  → camera, verdict stack, timeline
-                    desktop → verdict stack on the LEFT, live preview on the
-                              RIGHT with the timeline beneath it. */}
-              <div className="order-1 lg:order-none lg:col-span-3 lg:col-start-3 lg:row-start-1">
+            <div className="grid items-start gap-4 md:grid-cols-2 lg:grid-cols-5">
+              {/* Order & responsive layout:
+                    Mobile (<768px): Camera -> Status & Controls -> Timeline
+                    Tablet (768px-1024px): 2-column balanced grid
+                    PC (1024px+): Verdict/Control sidebar on left (2 cols), Camera + Timeline on right (3 cols) */}
+              <div className="order-1 md:order-1 md:col-span-2 lg:order-none lg:col-span-3 lg:col-start-3 lg:row-start-1">
                 <CameraView
                   videoRef={videoRef} overlayRef={overlayRef}
                   camState={camState} camError={camError} onRetry={retry}
@@ -171,12 +171,14 @@ export default function App() {
                           style={{ color: 'var(--accent-ink)' }}>
                     Why?
                   </button>
-                  {'  ·  '}
-                  <span className="mono">keys 1-6 demo · 0 clear · T theme · G grid</span>
+                  <span className="hidden sm:inline">
+                    {'  ·  '}
+                    <span className="mono">keys 1-6 demo · 0 clear · T theme · G grid</span>
+                  </span>
                 </p>
               </div>
 
-              <div className="order-2 space-y-4 lg:order-none lg:col-span-2 lg:col-start-1 lg:row-span-2 lg:row-start-1">
+              <div className="order-2 space-y-4 md:order-2 md:col-span-1 lg:order-none lg:col-span-2 lg:col-start-1 lg:row-span-2 lg:row-start-1">
                 <StatusCard verdict={verdict} mlStatus={mlStatus} analysisMs={analysisMs} />
                 <DetectionPanel scores={scores} spark={spark} showGrid={showGrid}
                                 onToggleGrid={() => setShowGrid((g) => !g)} />
@@ -184,7 +186,7 @@ export default function App() {
                               soundOn={soundOn} onToggleSound={() => setSoundOn((s) => !s)} />
               </div>
 
-              <div className="order-3 lg:order-none lg:col-span-3 lg:col-start-3 lg:row-start-2">
+              <div className="order-3 md:order-3 md:col-span-1 lg:order-none lg:col-span-3 lg:col-start-3 lg:row-start-2">
                 <EventHistory events={events} onExport={() => setReportOpen(true)} />
               </div>
             </div>
