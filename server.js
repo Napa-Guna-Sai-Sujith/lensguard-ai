@@ -25,6 +25,11 @@ const pool = new pg.Pool({
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
+// Root route handler for Render browser checks
+app.get('/', (req, res) => {
+  res.send('⚡ LensGuard AI Backend Auth Server is running successfully!');
+});
+
 // Health Check Endpoint for Render & Monitoring
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', time: new Date() });
