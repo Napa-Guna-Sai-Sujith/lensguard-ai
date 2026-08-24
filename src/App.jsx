@@ -13,6 +13,7 @@ import AboutModal from './components/AboutModal.jsx';
 import ReportModal from './components/ReportModal.jsx';
 import LabMode from './components/LabMode.jsx';
 import AuthModal from './components/AuthModal.jsx';
+import AuthPage from './components/AuthPage.jsx';
 
 const MAX_EVENTS = 10;
 
@@ -84,7 +85,7 @@ export default function App() {
     videoRef, canvasRef, overlayRef, camState, camError, devices, deviceId,
     switchDevice, retry, facingMirror, scores, verdict, spark, analysisMs, mlStatus,
     demoSubstituted, cameraOn, toggleCamera,
-  } = useCameraAnalysis({ demoMode, onStateChange });
+  } = useCameraAnalysis({ demoMode, onStateChange, enabled: !!user });
 
   // Keyboard shortcuts for a smooth stage demo.
   useEffect(() => {
@@ -99,6 +100,11 @@ export default function App() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [toggle]);
+
+  // Mandatory Login Gate: user must log in before accessing the main dashboard
+  if (!user) {
+    return <AuthPage onAuthSuccess={(u) => setUser(u)} />;
+  }
 
   const st = STATES[verdict.state] || STATES.good;
 
